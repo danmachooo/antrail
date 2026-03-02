@@ -27,6 +27,9 @@ export default defineNuxtConfig({
 
 	runtimeConfig: {
 		apiSecret: process.env.NUXT_GEMINI_API_KEY,
+		geminiApiKey: process.env.NUXT_GEMINI_API_KEY,
+		groqApiKey: process.env.NUXT_GROQ_API_KEY,
+		groqModel: process.env.NUXT_GROQ_MODEL || "llama-3.1-8b-instant",
 		public: {
 			apiBase: process.env.NUXT_PUBLIC_API_BASE,
 		},

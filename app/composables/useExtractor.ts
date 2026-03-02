@@ -1,4 +1,5 @@
 // composables/useExtractor.ts
+import type { TutorialData } from "#shared/types/tutorial.types"
 import { useTutorialStore } from "~/stores/tutorial"
 
 export function useExtractor() {
@@ -9,14 +10,14 @@ export function useExtractor() {
 
 		store.isLoading = true
 		store.loadingProgress = 0
-		store.loadingMessage = "⟳ Sending to server..."
+		store.loadingMessage = "Sending to server..."
 		store.fileName = filename
 		store.setStage("extracting")
 
 		try {
 			const progressInterval = startProgressSimulation()
 
-			const result = await $fetch("/api/extract", {
+			const result = await $fetch<TutorialData>("/api/extract", {
 				method: "POST",
 				body: { text, filename },
 			})
@@ -24,15 +25,16 @@ export function useExtractor() {
 			clearInterval(progressInterval)
 
 			store.loadingProgress = 100
-			store.loadingMessage = "✓ Complete! Building step cards..."
+			store.loadingMessage = "Complete! Building step cards..."
 
 			await delay(400)
 
-			store.setTutorial(result as any)
+			store.setTutorial(result)
 			store.setStage("json")
 			return true
-		} catch (err: any) {
-			store.loadingMessage = `✗ Error: ${err?.data?.message ?? err?.message ?? "Something went wrong."}`
+		} catch (err: unknown) {
+			const error = err as { data?: { message?: string }; message?: string }
+			store.loadingMessage = `Error: ${error.data?.message ?? error.message ?? "Something went wrong."}`
 			store.loadingProgress = 0
 			store.setStage("upload")
 			return false
@@ -44,17 +46,15 @@ export function useExtractor() {
 	return { extract }
 }
 
-// ── Helpers ────────────────────────────────────────────────────
-
 function startProgressSimulation() {
 	const store = useTutorialStore()
 
 	const messages = [
-		"⟳ Sending to server...",
-		"⟳ Preprocessing and normalizing text...",
-		"⟳ Calling Gemini with structured prompt...",
-		"⟳ Extracting steps and UI element hints...",
-		"⟳ Validating JSON schema output...",
+		"Sending to server...",
+		"Preprocessing and normalizing text...",
+		"Calling Groq with structured prompt...",
+		"Extracting steps and UI element hints...",
+		"Validating JSON schema output...",
 	]
 
 	let i = 0

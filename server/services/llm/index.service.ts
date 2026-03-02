@@ -1,21 +1,29 @@
-
 import { GoogleGenAI } from "@google/genai"
 import { GeminiService } from "#server/services/llm/gemini.service"
-// import library here if mag switch ng model if ever
+import { GroqService } from "#server/services/llm/groq.service"
 
-export function getAIClient() {
+function getGeminiClient() {
 	const config = useRuntimeConfig()
-	const apiKey = config.apiSecret
-	if (!apiKey) throw createError({ statusCode: 500, message: "LLM API key not set." })
+	const apiKey = config.geminiApiKey
+	if (!apiKey) throw createError({ statusCode: 500, message: "Gemini API key not set." })
 	return new GoogleGenAI({ apiKey })
 }
 
-type Provider = "gemini" // | 'openai'
+function getGroqService() {
+	const config = useRuntimeConfig()
+	const apiKey = config.groqApiKey
+	if (!apiKey) throw createError({ statusCode: 500, message: "Groq API key not set." })
+	return new GroqService(apiKey, config.groqModel)
+}
 
-export function getLLMService(provider: Provider = "gemini") {
+type Provider = "gemini" | "groq"
+
+export function getLLMService(provider: Provider = "groq") {
 	switch (provider) {
 		case "gemini":
-			return new GeminiService(getAIClient())
+			return new GeminiService(getGeminiClient())
+		case "groq":
+			return getGroqService()
 		default:
 			throw createError({ statusCode: 500, message: `Unknown LLM provider: ${provider}` })
 	}

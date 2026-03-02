@@ -2,15 +2,15 @@
 import { extractTutorial } from "#server/helpers/extract.helpers"
 import { manualSchema } from "#shared/schema/manual.schema"
 import type { ManualSchemaInput } from "#shared/schema/manual.schema"
-import { StatusCodes } from 'http-status-codes';
+import { StatusCodes } from "http-status-codes"
 
 export default defineEventHandler(async event => {
-	const data = await readValidatedBody(event, manualSchema.safeParse);
+	const data = await readValidatedBody(event, manualSchema.safeParse)
 
-	if(!data.success) {
+	if (!data.success) {
 		throw createError({
 			statusCode: StatusCodes.BAD_REQUEST,
-			message: data.error.message
+			message: data.error.message,
 		})
 	}
 	const manual = data.data as ManualSchemaInput

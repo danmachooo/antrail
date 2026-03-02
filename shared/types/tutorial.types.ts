@@ -1,4 +1,4 @@
-export type ElementType = "button" | "input" | "navigation" | "link" | "form" | "table"
+export type ElementType = "button" | "input" | "select" | "navigation" | "link" | "form" | "table"
 
 export interface TutorialStep {
 	stepNumber: number

@@ -11,8 +11,8 @@
 				<span class="font-mono text-cyan-200">{{ store.tutorial?.extractedFrom }}</span>
 			</NoticeBox>
 
-			<div
-				class="max-h-[420px] overflow-auto rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-xs leading-7 text-slate-300"
+			<pre
+				class="max-h-[420px] overflow-auto whitespace-pre rounded-xl border border-slate-800 bg-slate-900 p-4 font-mono text-xs leading-7 text-slate-300"
 				v-html="highlighted"
 			/>
 

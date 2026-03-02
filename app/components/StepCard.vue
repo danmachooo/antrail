@@ -73,6 +73,7 @@
 						>
 							<option>button</option>
 							<option>input</option>
+							<option>select</option>
 							<option>navigation</option>
 							<option>link</option>
 							<option>form</option>
