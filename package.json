@@ -8,6 +8,7 @@
 		"lint:fix": "eslint . --fix",
 		"typecheck": "nuxt typecheck",
 		"dev": "nuxt dev",
+		"start": "node --env-file .env .output/server/index.mjs",
 		"generate": "nuxt generate",
 		"preview": "nuxt preview",
 		"postinstall": "nuxt prepare",
