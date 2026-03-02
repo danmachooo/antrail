@@ -1,46 +1,43 @@
 import { GoogleGenAI } from "@google/genai"
 
-export default defineEventHandler(async (event) => {
-    const {
-        text, filename
-    } = await readBody(event)
+export default defineEventHandler(async event => {
+	const { text, filename } = await readBody(event)
 
-    const config = useRuntimeConfig()
+	const config = useRuntimeConfig()
 
-    // VALIDATE INPUT
-    if(!text || typeof text !== "string" || !text.trim()) {
-        throw createError({
-            statusCode: 400,
-            message: "No text provided."
-        })
-    }
+	// VALIDATE INPUT
+	if (!text || typeof text !== "string" || !text.trim()) {
+		throw createError({
+			statusCode: 400,
+			message: "No text provided.",
+		})
+	}
 
-    // GRAB API KEY
-    const apiKey = config.apiSecret;
+	// GRAB API KEY
+	const apiKey = config.apiSecret
 
-    if(!apiKey) {
-        throw createError({
-            statusCode: 500,
-            message: "LLM API key not set."
-        })
-    }
+	if (!apiKey) {
+		throw createError({
+			statusCode: 500,
+			message: "LLM API key not set.",
+		})
+	}
 
-    const ai = new GoogleGenAI({
-        apiKey
-    })
+	const ai = new GoogleGenAI({
+		apiKey,
+	})
 
-    const response = await ai.models.generateContent({
-        model: "gemini-3-flash-preview",
-        config: {
-            responseMimeType: "application/json",
-        }, 
-        contents: [
-            {
-                role: "user",
-                parts: [
-                    {
-                        text:  
-                        `
+	const response = await ai.models.generateContent({
+		model: "gemini-3-flash-preview",
+		config: {
+			responseMimeType: "application/json",
+		},
+		contents: [
+			{
+				role: "user",
+				parts: [
+					{
+						text: `
                             You are a tutorial extraction engine for a tool called AnTrail.
                             Your job is to read a user manual and extract discrete, actionable
                             UI steps that a user would perform in a web application.
@@ -79,28 +76,28 @@ export default defineEventHandler(async (event) => {
                             Manual text:
                             ${text}
                         `.trim(),
-                    }
-                ]
-            }
-        ]
-    })
+					},
+				],
+			},
+		],
+	})
 
-    const raw = response.text
+	const raw = response.text
 
-    if(!raw) {
-        throw createError({
-            statusCode: 500,
-            message: "Empty response from Gemini."
-        })
-    }
+	if (!raw) {
+		throw createError({
+			statusCode: 500,
+			message: "Empty response from Gemini.",
+		})
+	}
 
-    try {
-        const parsed = JSON.parse(raw)
-        return parsed
-    } catch {
-        createError({
-            statusCode: 500,
-            message: "Gemini returned invalid JSON."
-        })
-    }
+	try {
+		const parsed = JSON.parse(raw)
+		return parsed
+	} catch {
+		createError({
+			statusCode: 500,
+			message: "Gemini returned invalid JSON.",
+		})
+	}
 })

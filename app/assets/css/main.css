@@ -3,108 +3,107 @@
 @tailwind utilities;
 
 :root {
-  --bg: #060b16;
-  --text: #e2e8f0;
-  --font-mono: 'IBM Plex Mono', monospace;
-  --font-sans: 'Syne', sans-serif;
+	--bg: #060b16;
+	--text: #e2e8f0;
+	--font-mono: "IBM Plex Mono", monospace;
+	--font-sans: "Syne", sans-serif;
 }
 
 @layer base {
-  * {
-    box-sizing: border-box;
-  }
+	* {
+		box-sizing: border-box;
+	}
 
-  html {
-    scroll-behavior: smooth;
-    scrollbar-color: rgba(148, 163, 184, 0.42) rgba(15, 23, 42, 0.35);
-    scrollbar-width: thin;
-  }
+	html {
+		scroll-behavior: smooth;
+		scrollbar-color: rgba(148, 163, 184, 0.42) rgba(15, 23, 42, 0.35);
+		scrollbar-width: thin;
+	}
 
-  body {
-    margin: 0;
-    min-height: 100vh;
-    overflow-x: hidden;
-    background:
-      radial-gradient(circle at 20% -10%, rgba(45, 212, 191, 0.18), transparent 32%),
-      radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.14), transparent 35%),
-      var(--bg);
-    color: var(--text);
-    font-family: var(--font-sans);
-    -webkit-font-smoothing: antialiased;
-  }
+	body {
+		margin: 0;
+		min-height: 100vh;
+		overflow-x: hidden;
+		background:
+			radial-gradient(circle at 20% -10%, rgba(45, 212, 191, 0.18), transparent 32%),
+			radial-gradient(circle at 80% 0%, rgba(56, 189, 248, 0.14), transparent 35%), var(--bg);
+		color: var(--text);
+		font-family: var(--font-sans);
+		-webkit-font-smoothing: antialiased;
+	}
 
-  a {
-    color: inherit;
-    text-decoration: none;
-  }
+	a {
+		color: inherit;
+		text-decoration: none;
+	}
 
-  input,
-  textarea,
-  code,
-  pre {
-    font-family: var(--font-mono);
-  }
+	input,
+	textarea,
+	code,
+	pre {
+		font-family: var(--font-mono);
+	}
 
-  *::-webkit-scrollbar {
-    width: 10px;
-    height: 10px;
-  }
+	*::-webkit-scrollbar {
+		width: 10px;
+		height: 10px;
+	}
 
-  *::-webkit-scrollbar-track {
-    background: rgba(15, 23, 42, 0.4);
-    border-radius: 999px;
-  }
+	*::-webkit-scrollbar-track {
+		background: rgba(15, 23, 42, 0.4);
+		border-radius: 999px;
+	}
 
-  *::-webkit-scrollbar-thumb {
-    border: 2px solid transparent;
-    border-radius: 999px;
-    background-clip: content-box;
-    background-image: linear-gradient(180deg, rgba(45, 212, 191, 0.72), rgba(56, 189, 248, 0.72));
-  }
+	*::-webkit-scrollbar-thumb {
+		border: 2px solid transparent;
+		border-radius: 999px;
+		background-clip: content-box;
+		background-image: linear-gradient(180deg, rgba(45, 212, 191, 0.72), rgba(56, 189, 248, 0.72));
+	}
 
-  *::-webkit-scrollbar-thumb:hover {
-    background-image: linear-gradient(180deg, rgba(45, 212, 191, 0.9), rgba(56, 189, 248, 0.9));
-  }
+	*::-webkit-scrollbar-thumb:hover {
+		background-image: linear-gradient(180deg, rgba(45, 212, 191, 0.9), rgba(56, 189, 248, 0.9));
+	}
 
-  *::-webkit-scrollbar-corner {
-    background: transparent;
-  }
+	*::-webkit-scrollbar-corner {
+		background: transparent;
+	}
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
+	from {
+		opacity: 0;
+		transform: translateY(14px);
+	}
 
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+	to {
+		opacity: 1;
+		transform: translateY(0);
+	}
 }
 
 @layer components {
-  .fade-up {
-    animation: fadeUp 0.35s ease both;
-  }
+	.fade-up {
+		animation: fadeUp 0.35s ease both;
+	}
 }
 
 .jk {
-  color: #7dd3fc;
+	color: #7dd3fc;
 }
 
 .js {
-  color: #86efac;
+	color: #86efac;
 }
 
 .jn {
-  color: #fbbf24;
+	color: #fbbf24;
 }
 
 .jb {
-  color: #fca5a5;
+	color: #fca5a5;
 }
 
 .jnull {
-  color: #94a3b8;
+	color: #94a3b8;
 }
