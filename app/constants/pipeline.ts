@@ -1,6 +1,6 @@
 import { Braces, Eye, FileUp, ListChecks, Package, type LucideIcon } from "lucide-vue-next"
 
-import type { PipelineStage } from "~/stores/tutorial"
+import type { PipelineStage } from "#shared/types/pipeline.type"
 
 export interface PipelineStepConfig {
 	id: Extract<PipelineStage, "upload" | "json" | "steps" | "preview" | "export">

@@ -51,7 +51,7 @@
 <script setup lang="ts">
 import { PIPELINE_ORDER } from "~/constants/pipeline"
 import { useTutorialStore } from "~/stores/tutorial"
-import type { PipelineStage } from "~/stores/tutorial"
+import type { PipelineStage } from "#shared/types/pipeline.type"
 
 const store = useTutorialStore()
 const { stage, hasData } = storeToRefs(store)

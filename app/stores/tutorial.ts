@@ -1,8 +1,7 @@
 import { defineStore } from "pinia"
 import { computed, ref } from "vue"
-import type { TutorialData, TutorialStep } from "~/data/mock"
-
-export type PipelineStage = "upload" | "extracting" | "json" | "steps" | "preview" | "export"
+import type { TutorialData, TutorialStep } from "#shared/types/tutorial.types"
+import type { PipelineStage } from "#shared/types/pipeline.type"
 
 export const useTutorialStore = defineStore("tutorial", () => {
 	const stage = ref<PipelineStage>("upload")

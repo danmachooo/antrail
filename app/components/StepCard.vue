@@ -130,7 +130,7 @@
 <script setup lang="ts">
 import { Check, PencilLine, Target, Trash2, X } from "lucide-vue-next"
 
-import type { TutorialStep } from "~/data/mock"
+import type { TutorialStep } from "#shared/types/tutorial.types"
 import AppButton from "~/components/ui/AppButton.vue"
 
 const props = defineProps<{ step: TutorialStep }>()

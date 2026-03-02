@@ -1,4 +1,4 @@
-import type { TutorialData } from "~/data/mock"
+import type { TutorialData } from "#shared/types/tutorial.types"
 
 export function useExporter() {
 	function generateDriverSnippet(tutorial: TutorialData): string {

@@ -1,23 +1,4 @@
-export type ElementType = "button" | "input" | "navigation" | "link" | "form" | "table"
-
-export interface TutorialStep {
-	stepNumber: number
-	title: string
-	instruction: string
-	uiElementHint: string
-	elementType: ElementType
-	suggestedSelector: string | null
-	confirmedSelector: string | null
-	confidence: number
-}
-
-export interface TutorialData {
-	tutorialTitle: string
-	appName: string
-	extractedFrom: string
-	totalSteps: number
-	steps: TutorialStep[]
-}
+import type { TutorialData } from "#shared/types/tutorial.types"
 
 export const SAMPLE_MANUAL = `# Inventory Management System - User Manual
 
@@ -115,15 +96,6 @@ export const MOCK_TUTORIAL: TutorialData = {
 		},
 	],
 }
-
-export const LOADING_MESSAGES = [
-	"Sending to server (POST /api/extract)...",
-	"Preprocessing and normalizing text...",
-	"Calling GPT-4o with structured prompt...",
-	"Extracting steps and UI element hints...",
-	"Validating JSON schema output...",
-	"Complete. Building step cards...",
-]
 
 export const IMS_ITEMS = [
 	{ name: "Office Chair", sku: "CHR-001", qty: 24, status: "In Stock" },

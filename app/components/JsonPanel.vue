@@ -47,8 +47,10 @@ const highlighted = computed(() => {
 })
 
 function syntaxHighlight(json: string) {
-	return json.replace(
-		/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g,
+	const escaped = json.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;")
+
+	return escaped.replace(
+		/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+-]?\d+)?)/g,
 		match => {
 			let tokenClass = "jn"
 			if (/^"/.test(match)) tokenClass = /:$/.test(match) ? "jk" : "js"
