@@ -2,49 +2,49 @@
 
 import type { TutorialData } from "#shared/types/tutorial.types"
 import { getLLMService } from "#server/services/llm/index.service"
+import type { ManualSchemaInput } from "#shared/schema/manual.schema"
 
-export function buildPrompt(text: string, filename: string) {
-	return `
-You are a tutorial extraction engine for a tool called AnTrail.
-Your job is to read a user manual and extract discrete, actionable
-UI steps that a user would perform in a web application.
+export function buildPrompt(manual: ManualSchemaInput) {
+  return `
+You are a tutorial extraction engine for AnTrail.
+Extract clear, actionable UI steps from a user manual for a web app.
 
-Return ONLY valid JSON matching this exact schema:
+Return ONLY valid JSON in this exact shape:
 {
-  "tutorialTitle": "string — the name of this workflow",
-  "appName": "string — the name of the application if mentioned, otherwise 'Unknown App'",
-  "extractedFrom": "string — the filename passed to you",
+  "tutorialTitle": "string",
+  "appName": "string (or 'Unknown App')",
+  "extractedFrom": "string (filename)",
   "totalSteps": number,
   "steps": [
     {
       "stepNumber": number,
-      "title": "string — short 3-5 word label",
-      "instruction": "string — clear instruction written directly to the user",
-      "uiElementHint": "string — describe the UI element (e.g. 'Save button, top-right corner')",
+      "title": "3-5 word label",
+      "instruction": "Second-person action (e.g., 'Click the Save button')",
+      "uiElementHint": "Describe the UI element and location",
       "elementType": "button | input | navigation | link | form | table",
-      "suggestedSelector": "string | null — best guess CSS selector",
+      "suggestedSelector": "string | null",
       "confirmedSelector": null,
-      "confidence": number between 0 and 1
+      "confidence": number (0-1)
     }
   ]
 }
 
 Rules:
-- Only extract steps that describe a direct user action (click, type, select, navigate)
-- Ignore introductory paragraphs, notes, warnings, and disclaimers
-- Flatten nested sub-steps into separate top-level steps
-- Write instructions in second person ("Click the Save button")
-- If you cannot determine a CSS selector, set suggestedSelector to null
-- Always set confirmedSelector to null
-- Set confidence based on how clearly the step maps to a specific UI element
+- Include ONLY direct user actions (click, type, select, navigate).
+- Ignore intros, notes, warnings, and disclaimers.
+- Flatten nested steps into separate top-level steps.
+- Use second person.
+- If selector is unclear, set suggestedSelector to null.
+- Always set confirmedSelector to null.
+- Confidence reflects clarity of UI mapping.
 
-Filename: ${filename ?? "manual.txt"}
-
-Manual text: ${text}
+Filename: ${manual.filename ?? "manual.txt"}
+Manual:
+${manual.text}
 `.trim()
 }
 
-export async function extractTutorial(text: string, filename: string): Promise<TutorialData> {
+export async function extractTutorial(manual: ManualSchemaInput): Promise<TutorialData> {
 	const llm = getLLMService("gemini")
-	return llm.generateJSON<TutorialData>(buildPrompt(text, filename))
+	return llm.generateJSON<TutorialData>(buildPrompt(manual))
 }
