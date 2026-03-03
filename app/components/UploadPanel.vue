@@ -62,6 +62,32 @@
 				<div class="h-px flex-1 bg-slate-800" />
 			</div>
 
+			<details class="rounded-xl border border-slate-800 bg-slate-900/60 p-4">
+				<summary class="cursor-pointer font-mono text-xs font-semibold text-cyan-200">
+					Manual Format Guide (for more accurate extraction)
+				</summary>
+				<div class="mt-3 space-y-3 text-xs text-slate-300">
+					<p>Follow this structure so the AI can map steps and selectors more reliably:</p>
+					<ul class="list-disc space-y-1 pl-4">
+						<li>Use one direct action per line (Click, Enter, Select, Navigate).</li>
+						<li>Include the visible UI label in quotes (example: "Copy JSON").</li>
+						<li>Mention the section/location (header, sidebar, modal, panel).</li>
+						<li>Avoid long explanations, notes, and troubleshooting in the main steps.</li>
+						<li>Keep each step specific and executable.</li>
+					</ul>
+					<div class="rounded-lg border border-slate-800 bg-slate-950 p-3">
+						<p class="mb-2 font-mono text-[11px] uppercase tracking-wide text-slate-400">Template</p>
+						<pre class="overflow-auto whitespace-pre-wrap font-mono text-[11px] leading-6 text-slate-300">{{
+							manualTemplate
+						}}</pre>
+					</div>
+					<AppButton size="sm" variant="secondary" @click="applyTemplate">
+						<FileText class="h-4 w-4" />
+						Use This Template
+					</AppButton>
+				</div>
+			</details>
+
 			<textarea
 				v-model="manualText"
 				data-testid="manual-textarea"
@@ -131,10 +157,30 @@ const isDragging = ref(false)
 const fileName = ref("")
 const manualText = ref("")
 const selectedFile = ref<File | null>(null)
+const manualTemplate = `# App Tutorial Manual
+Context: This tutorial applies to route "/"
+
+1. Navigate to the "Upload Documentation" section.
+2. Click the "Upload a file" area.
+3. Click the "Extract Steps with AI" button.
+4. Click the "Copy JSON" button in Structured Extraction.
+5. Click the "View Step Cards" button.
+6. Click the "Preview Tutorial" button.
+7. Click the "Start Tutorial" button.
+8. Click the "Continue to Export" button.
+9. Click the "Publish & Generate Script Tag" button.
+10. Click the "Copy Tag" button.`
 
 function loadSample() {
 	manualText.value = SAMPLE_MANUAL
 	fileName.value = "inventory-manual.txt"
+	selectedFile.value = null
+	if (fileInput.value) fileInput.value.value = ""
+}
+
+function applyTemplate() {
+	manualText.value = manualTemplate
+	fileName.value = "manual-template.txt"
 	selectedFile.value = null
 	if (fileInput.value) fileInput.value.value = ""
 }
