@@ -1,5 +1,4 @@
 import mammoth from "mammoth"
-import { PDFParse } from "pdf-parse"
 import { StatusCodes } from "http-status-codes"
 import { isHandledError } from "#server/utils/error-handler"
 
@@ -16,7 +15,43 @@ function normalizeText(text: string): string {
 		.trim()
 }
 
+type PDFParseCtor = new (params: { data: Buffer }) => {
+	getText: () => Promise<{ text?: string }>
+	destroy: () => Promise<void>
+}
+
+async function ensureDomMatrixPolyfill() {
+	if (typeof globalThis.DOMMatrix !== "undefined") return
+
+	try {
+		const canvas = await import("@napi-rs/canvas")
+		if (typeof canvas.DOMMatrix !== "undefined") {
+			const runtimeGlobal = globalThis as unknown as { DOMMatrix?: unknown }
+			runtimeGlobal.DOMMatrix = canvas.DOMMatrix
+		}
+	} catch {
+		// Best-effort polyfill only. Parsing may still fail for unsupported runtimes.
+	}
+}
+
+async function getPdfParserCtor(): Promise<PDFParseCtor> {
+	await ensureDomMatrixPolyfill()
+	const module = await import("pdf-parse/node")
+	const ctor = (module as { PDFParse?: unknown }).PDFParse
+
+	if (typeof ctor !== "function") {
+		throw createError({
+			statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+			statusMessage: "PDF parser unavailable",
+			message: "Unable to initialize PDF parser in this runtime.",
+		})
+	}
+
+	return ctor as PDFParseCtor
+}
+
 async function parsePdfText(buffer: Buffer): Promise<string> {
+	const PDFParse = await getPdfParserCtor()
 	const parser = new PDFParse({ data: buffer })
 
 	try {
