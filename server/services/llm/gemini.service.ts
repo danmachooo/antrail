@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai"
 import { BaseLLMService } from "#server/services/llm/basellm.service"
+import { isHandledError } from "#server/utils/error-handler"
 import { StatusCodes } from "http-status-codes"
 
 type GeminiErrorDetail = {
@@ -46,6 +47,10 @@ export class GeminiService extends BaseLLMService {
 	}
 
 	private throwMappedError(error: unknown): never {
+		if (isHandledError(error)) {
+			throw error
+		}
+
 		const apiError = error as { status?: number; message?: string }
 		const status = apiError?.status
 		const payload = this.parseErrorMessage(apiError?.message)
@@ -99,7 +104,6 @@ export class GeminiService extends BaseLLMService {
 			if (!raw) throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Empty response from Gemini." })
 			return raw
 		} catch (error) {
-			if ((error as { statusCode?: number })?.statusCode) throw error
 			this.throwMappedError(error)
 		}
 	}
@@ -122,7 +126,6 @@ export class GeminiService extends BaseLLMService {
 				throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Gemini returned invalid JSON." })
 			}
 		} catch (error) {
-			if ((error as { statusCode?: number })?.statusCode) throw error
 			this.throwMappedError(error)
 		}
 	}

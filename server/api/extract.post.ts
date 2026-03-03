@@ -1,10 +1,11 @@
 // server/api/extract.post.ts
 import { extractTutorial } from "#server/helpers/extract.helpers"
+import { withGlobalErrorHandler } from "#server/utils/error-handler"
 import { manualSchema } from "#shared/schema/manual.schema"
 import type { ManualSchemaInput } from "#shared/schema/manual.schema"
 import { StatusCodes } from "http-status-codes"
 
-export default defineEventHandler(async event => {
+export default defineEventHandler(withGlobalErrorHandler(async event => {
 	const data = await readValidatedBody(event, manualSchema.safeParse)
 
 	if (!data.success) {
@@ -15,15 +16,9 @@ export default defineEventHandler(async event => {
 	}
 	const manual = data.data as ManualSchemaInput
 
-	try {
-		const tutorial = await extractTutorial(manual)
-		return tutorial
-	} catch (error) {
-		if ((error as { statusCode?: number })?.statusCode) throw error
-		throw createError({
-			statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
-			statusMessage: "Tutorial extraction failed",
-			message: "Unexpected error while extracting tutorial data.",
-		})
-	}
-})
+	return extractTutorial(manual)
+}, {
+	statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+	statusMessage: "Tutorial extraction failed",
+	message: "Unexpected error while extracting tutorial data.",
+}))
