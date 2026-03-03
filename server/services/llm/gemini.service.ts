@@ -1,5 +1,6 @@
 import { GoogleGenAI } from "@google/genai"
 import { BaseLLMService } from "#server/services/llm/basellm.service"
+import { StatusCodes } from "http-status-codes"
 
 type GeminiErrorDetail = {
 	retryDelay?: string
@@ -49,10 +50,10 @@ export class GeminiService extends BaseLLMService {
 		const status = apiError?.status
 		const payload = this.parseErrorMessage(apiError?.message)
 
-		if (status === 429) {
+		if (status === StatusCodes.TOO_MANY_REQUESTS) {
 			const retryAfterSeconds = this.getRetryAfterSeconds(payload)
 			throw createError({
-				statusCode: 429,
+				statusCode: StatusCodes.TOO_MANY_REQUESTS,
 				statusMessage: "LLM quota exceeded",
 				message: retryAfterSeconds
 					? `Gemini quota exceeded. Retry after ${retryAfterSeconds}s or update API billing/quota settings.`
@@ -61,16 +62,16 @@ export class GeminiService extends BaseLLMService {
 			})
 		}
 
-		if (status && status >= 400 && status < 500) {
+		if (status && status >= StatusCodes.BAD_REQUEST && status < StatusCodes.INTERNAL_SERVER_ERROR) {
 			throw createError({
-				statusCode: 400,
+				statusCode: StatusCodes.BAD_REQUEST,
 				statusMessage: "Invalid request to LLM provider",
 				message: payload?.error?.message ?? "Gemini rejected the request.",
 				data: { provider: "gemini", providerStatus: status },
 			})
 		}
 
-		if (status && status >= 500) {
+		if (status && status >= StatusCodes.INTERNAL_SERVER_ERROR) {
 			throw createError({
 				statusCode: 502,
 				statusMessage: "LLM provider unavailable",
@@ -80,7 +81,7 @@ export class GeminiService extends BaseLLMService {
 		}
 
 		throw createError({
-			statusCode: 500,
+			statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
 			statusMessage: "LLM request failed",
 			message: "Unexpected error while calling Gemini.",
 			data: { provider: "gemini" },
@@ -95,7 +96,7 @@ export class GeminiService extends BaseLLMService {
 			})
 
 			const raw = response.text
-			if (!raw) throw createError({ statusCode: 500, message: "Empty response from Gemini." })
+			if (!raw) throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Empty response from Gemini." })
 			return raw
 		} catch (error) {
 			if ((error as { statusCode?: number })?.statusCode) throw error
@@ -113,12 +114,12 @@ export class GeminiService extends BaseLLMService {
 			})
 
 			const raw = response.text
-			if (!raw) throw createError({ statusCode: 500, message: "Empty response from Gemini." })
+			if (!raw) throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Empty response from Gemini." })
 
 			try {
 				return JSON.parse(raw) as T
 			} catch {
-				throw createError({ statusCode: 500, message: "Gemini returned invalid JSON." })
+				throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Gemini returned invalid JSON." })
 			}
 		} catch (error) {
 			if ((error as { statusCode?: number })?.statusCode) throw error

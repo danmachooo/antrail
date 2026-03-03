@@ -1,4 +1,5 @@
 import { BaseLLMService } from "#server/services/llm/basellm.service"
+import { StatusCodes } from "http-status-codes"
 
 type GroqMessage = {
 	content?: string
@@ -41,18 +42,18 @@ export class GroqService extends BaseLLMService {
 
 		const providerMessage = payload?.error?.message
 
-		if (response.status === 429) {
+		if (response.status === StatusCodes.TOO_MANY_REQUESTS) {
 			throw createError({
-				statusCode: 429,
+				statusCode: StatusCodes.TOO_MANY_REQUESTS,
 				statusMessage: "LLM quota exceeded",
 				message: providerMessage ?? "Groq rate limit or quota exceeded. Retry later.",
 				data: { provider: "groq" },
 			})
 		}
 
-		if (response.status >= 400 && response.status < 500) {
+		if (response.status >= StatusCodes.BAD_REQUEST && response.status < StatusCodes.INTERNAL_SERVER_ERROR) {
 			throw createError({
-				statusCode: 400,
+				statusCode: StatusCodes.BAD_REQUEST,
 				statusMessage: "Invalid request to LLM provider",
 				message: providerMessage ?? "Groq rejected the request.",
 				data: { provider: "groq", providerStatus: response.status },
@@ -89,7 +90,7 @@ export class GroqService extends BaseLLMService {
 		const text = body.choices?.[0]?.message?.content
 
 		if (!text) {
-			throw createError({ statusCode: 500, message: "Empty response from Groq." })
+			throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Empty response from Groq." })
 		}
 
 		return text
@@ -113,7 +114,7 @@ export class GroqService extends BaseLLMService {
 				return JSON.parse(slice) as T
 			}
 
-			throw createError({ statusCode: 500, message: "Groq returned invalid JSON." })
+			throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Groq returned invalid JSON." })
 		}
 	}
 
