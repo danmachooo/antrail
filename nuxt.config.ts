@@ -16,6 +16,13 @@ export default defineNuxtConfig({
 	app: {
 		head: {
 			title: "AnTrail - AI Tutorial Generator",
+			script: [
+				{
+					src: "http://localhost:3000/embed.js",
+					"data-token": "fa398e01ebf2",
+					defer: true,
+				},
+			],
 			meta: [
 				{
 					name: "description",
@@ -30,6 +37,8 @@ export default defineNuxtConfig({
 		geminiApiKey: process.env.NUXT_GEMINI_API_KEY,
 		groqApiKey: process.env.NUXT_GROQ_API_KEY,
 		groqModel: process.env.NUXT_GROQ_MODEL || "llama-3.1-8b-instant",
+		selectorProfile: process.env.NUXT_SELECTOR_PROFILE,
+		antrailToken: process.env.NUXT_ANTRAIL_TOKEN,
 		public: {
 			apiBase: process.env.NUXT_PUBLIC_API_BASE,
 		},

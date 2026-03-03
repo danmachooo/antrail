@@ -35,7 +35,7 @@ export function toHandledError(error: unknown, fallback: ErrorFallback = {}): Ha
 
 export function withGlobalErrorHandler<TEvent extends H3Event, TResult>(
 	handler: (event: TEvent) => Promise<TResult>,
-	fallback?: ErrorFallback,
+	fallback?: ErrorFallback
 ) {
 	return async (event: TEvent): Promise<TResult> => {
 		try {

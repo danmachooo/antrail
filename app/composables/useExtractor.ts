@@ -1,49 +1,83 @@
 // composables/useExtractor.ts
-import type { TutorialData } from "#shared/types/tutorial.types"
 import { useTutorialStore } from "~/stores/tutorial"
 
 export function useExtractor() {
 	const store = useTutorialStore()
 
-	async function extract(text: string, filename = "manual.txt") {
+	// ── File upload path ─────────────────────────────────────────
+	async function extract(file: File): Promise<boolean> {
+		store.isLoading = true
+		store.loadingProgress = 0
+		store.loadingMessage = "⟳ Reading file..."
+		store.fileName = file.name
+		store.setStage("extracting")
+
+		try {
+			const progressInterval = startProgressSimulation()
+
+			const formData = new FormData()
+			formData.append("file", file)
+			formData.append("filename", file.name)
+
+			const result = await $fetch("/api/extract", {
+				method: "POST",
+				body: formData,
+			})
+
+			clearInterval(progressInterval)
+			return finalize(result)
+		} catch (err: any) {
+			return handleError(err)
+		} finally {
+			store.isLoading = false
+		}
+	}
+
+	// ── Pasted text path ─────────────────────────────────────────
+	async function extractFromText(text: string, filename = "manual.txt"): Promise<boolean> {
 		if (!text.trim()) return false
 
 		store.isLoading = true
 		store.loadingProgress = 0
-		store.loadingMessage = "Sending to server..."
+		store.loadingMessage = "⟳ Sending to server..."
 		store.fileName = filename
 		store.setStage("extracting")
 
 		try {
 			const progressInterval = startProgressSimulation()
 
-			const result = await $fetch<TutorialData>("/api/extract", {
+			const result = await $fetch("/api/extract", {
 				method: "POST",
 				body: { text, filename },
 			})
 
 			clearInterval(progressInterval)
-
-			store.loadingProgress = 100
-			store.loadingMessage = "Complete! Building step cards..."
-
-			await delay(400)
-
-			store.setTutorial(result)
-			store.setStage("json")
-			return true
-		} catch (err: unknown) {
-			const error = err as { data?: { message?: string }; message?: string }
-			store.loadingMessage = `Error: ${error.data?.message ?? error.message ?? "Something went wrong."}`
-			store.loadingProgress = 0
-			store.setStage("upload")
-			return false
+			return finalize(result)
+		} catch (err: any) {
+			return handleError(err)
 		} finally {
 			store.isLoading = false
 		}
 	}
 
-	return { extract }
+	// ── Shared helpers ────────────────────────────────────────────
+	async function finalize(result: any): Promise<boolean> {
+		store.loadingProgress = 100
+		store.loadingMessage = "✓ Complete! Building step cards..."
+		await delay(400)
+		store.setTutorial(result)
+		store.setStage("json")
+		return true
+	}
+
+	function handleError(err: any): boolean {
+		store.loadingMessage = `✗ Error: ${err?.data?.message ?? err?.message ?? "Something went wrong."}`
+		store.loadingProgress = 0
+		store.setStage("upload")
+		return false
+	}
+
+	return { extract, extractFromText }
 }
 
 function startProgressSimulation() {

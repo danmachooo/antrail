@@ -141,11 +141,11 @@
 			</div>
 
 			<div class="flex flex-wrap items-center gap-3">
-				<AppButton @click="startTour">
+				<AppButton data-testid="start-preview-button" @click="startTour">
 					<component :is="tourActive ? RotateCcw : Play" class="h-4 w-4" />
 					{{ tourActive ? "Restart Tour" : "Start Tutorial" }}
 				</AppButton>
-				<AppButton variant="secondary" @click="store.setStage('export')">
+				<AppButton data-testid="continue-export-button" variant="secondary" @click="store.setStage('export')">
 					<ArrowRight class="h-4 w-4" />
 					Continue to Export
 				</AppButton>

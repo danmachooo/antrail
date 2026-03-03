@@ -8,12 +8,20 @@
 						? 'border-emerald-300/70 bg-emerald-400/10'
 						: 'border-slate-700 bg-slate-900/50 hover:border-slate-500'
 				"
+				data-testid="upload-button"
 				@dragover.prevent="isDragging = true"
 				@dragleave.prevent="isDragging = false"
 				@drop.prevent="onDrop"
 				@click="fileInput?.click()"
 			>
-				<input ref="fileInput" type="file" accept=".txt,.md,.pdf,.docx" class="hidden" @change="onFileChange" />
+				<input
+					ref="fileInput"
+					data-testid="manual-file-input"
+					type="file"
+					accept=".txt,.md,.pdf,.docx"
+					class="hidden"
+					@change="onFileChange"
+				/>
 
 				<div
 					class="mx-auto mb-4 inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-700 bg-slate-900 text-slate-200"
@@ -56,6 +64,7 @@
 
 			<textarea
 				v-model="manualText"
+				data-testid="manual-textarea"
 				rows="10"
 				class="w-full rounded-xl border border-slate-700 bg-slate-900 px-4 py-3 font-mono text-xs leading-7 text-slate-200 outline-none transition placeholder:text-slate-500 focus:border-cyan-400/60"
 				placeholder="Paste your user manual text here...
@@ -81,13 +90,22 @@ Example:
 			</div>
 
 			<div class="flex flex-wrap items-center gap-3">
-				<AppButton :disabled="store.isLoading || !manualText.trim()" @click="handleExtract">
+				<AppButton
+					data-testid="extract-button"
+					:disabled="store.isLoading || (!manualText.trim() && !selectedFile)"
+					@click="handleExtract"
+				>
 					<Loader2 v-if="store.isLoading" class="h-4 w-4 animate-spin" />
 					<Bot v-else class="h-4 w-4" />
 					{{ store.isLoading ? "Extracting..." : "Extract Steps with AI" }}
 				</AppButton>
 
-				<AppButton variant="secondary" :disabled="store.isLoading" @click="loadSample">
+				<AppButton
+					data-testid="load-sample-button"
+					variant="secondary"
+					:disabled="store.isLoading"
+					@click="loadSample"
+				>
 					<FileText class="h-4 w-4" />
 					Load Sample Manual
 				</AppButton>
@@ -98,48 +116,76 @@ Example:
 
 <script setup lang="ts">
 import { Bot, FileText, FileUp, Loader2 } from "lucide-vue-next"
+import AppButton from "~/components/ui/AppButton.vue"
+import PanelShell from "~/components/ui/PanelShell.vue"
 
 import { useExtractor } from "~/composables/useExtractor"
 import { SAMPLE_MANUAL } from "~/data/mock"
 import { useTutorialStore } from "~/stores/tutorial"
-import AppButton from "~/components/ui/AppButton.vue"
-import PanelShell from "~/components/ui/PanelShell.vue"
 
 const store = useTutorialStore()
-const { extract } = useExtractor()
+const { extract, extractFromText } = useExtractor()
 
 const fileInput = ref<HTMLInputElement | null>(null)
 const isDragging = ref(false)
 const fileName = ref("")
 const manualText = ref("")
+const selectedFile = ref<File | null>(null)
 
 function loadSample() {
 	manualText.value = SAMPLE_MANUAL
 	fileName.value = "inventory-manual.txt"
+	selectedFile.value = null
+	if (fileInput.value) fileInput.value.value = ""
 }
 
 function onFileChange(event: Event) {
 	const file = (event.target as HTMLInputElement).files?.[0]
-	if (file) readFile(file)
+	if (file) {
+		void readFile(file)
+	}
 }
 
 function onDrop(event: DragEvent) {
 	isDragging.value = false
 	const file = event.dataTransfer?.files[0]
-	if (file) readFile(file)
+	if (file) {
+		void readFile(file)
+	}
 }
 
-function readFile(file: File) {
+function isBinaryManual(file: File): boolean {
+	const lowerName = file.name.toLowerCase()
+	return (
+		file.type === "application/pdf" ||
+		file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
+		lowerName.endsWith(".pdf") ||
+		lowerName.endsWith(".docx")
+	)
+}
+
+async function readFile(file: File): Promise<void> {
 	fileName.value = file.name
-	const reader = new FileReader()
-	reader.onload = event => {
-		manualText.value = String(event.target?.result ?? "")
+
+	if (isBinaryManual(file)) {
+		selectedFile.value = file
+		manualText.value = ""
+		return
 	}
-	reader.readAsText(file)
+
+	manualText.value = await file.text()
+	selectedFile.value = null
 }
 
 async function handleExtract() {
-	store.manualText = manualText.value
-	await extract(manualText.value, fileName.value || "manual.txt")
+	if (selectedFile.value) {
+		await extract(selectedFile.value)
+		return
+	}
+
+	const text = manualText.value.trim()
+	if (text) {
+		await extractFromText(text, fileName.value || "manual.txt")
+	}
 }
 </script>

@@ -1,5 +1,12 @@
 import type { TutorialData } from "#shared/types/tutorial.types"
 
+type PublishResponse = {
+	token: string
+	route: string
+	embedUrl: string
+	scriptTag: string
+}
+
 export function useExporter() {
 	function generateDriverSnippet(tutorial: TutorialData): string {
 		const stepsCode = tutorial.steps
@@ -97,12 +104,20 @@ tour.start()`
 		URL.revokeObjectURL(url)
 	}
 
+	async function publishTutorial(route: string, tutorial: TutorialData): Promise<PublishResponse> {
+		return await $fetch<PublishResponse>("/api/publish", {
+			method: "POST",
+			body: { route, tutorial },
+		})
+	}
+
 	return {
 		generateDriverSnippet,
 		generateShepherdSnippet,
 		generateJSON,
 		copyToClipboard,
 		downloadFile,
+		publishTutorial,
 	}
 }
 

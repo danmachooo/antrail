@@ -101,7 +101,11 @@ export class GeminiService extends BaseLLMService {
 			})
 
 			const raw = response.text
-			if (!raw) throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Empty response from Gemini." })
+			if (!raw)
+				throw createError({
+					statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+					message: "Empty response from Gemini.",
+				})
 			return raw
 		} catch (error) {
 			this.throwMappedError(error)
@@ -118,12 +122,19 @@ export class GeminiService extends BaseLLMService {
 			})
 
 			const raw = response.text
-			if (!raw) throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Empty response from Gemini." })
+			if (!raw)
+				throw createError({
+					statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+					message: "Empty response from Gemini.",
+				})
 
 			try {
 				return JSON.parse(raw) as T
 			} catch {
-				throw createError({ statusCode: StatusCodes.INTERNAL_SERVER_ERROR, message: "Gemini returned invalid JSON." })
+				throw createError({
+					statusCode: StatusCodes.INTERNAL_SERVER_ERROR,
+					message: "Gemini returned invalid JSON.",
+				})
 			}
 		} catch (error) {
 			this.throwMappedError(error)

@@ -17,11 +17,11 @@
 			/>
 
 			<div class="flex flex-wrap items-center gap-3">
-				<AppButton @click="store.setStage('steps')">
+				<AppButton data-testid="verify-button" @click="store.setStage('steps')">
 					<ListChecks class="h-4 w-4" />
 					View Step Cards
 				</AppButton>
-				<AppButton variant="ghost" size="sm" @click="copyJSON">
+				<AppButton data-testid="copy-json-button" variant="ghost" size="sm" @click="copyJSON">
 					<component :is="copied ? Check : Copy" class="h-3.5 w-3.5" />
 					{{ copied ? "Copied" : "Copy JSON" }}
 				</AppButton>

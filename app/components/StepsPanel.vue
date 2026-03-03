@@ -21,11 +21,11 @@
 			<div class="h-px bg-slate-800" />
 
 			<div class="flex flex-wrap items-center gap-3">
-				<AppButton @click="store.setStage('preview')">
+				<AppButton data-testid="preview-button" @click="store.setStage('preview')">
 					<Play class="h-4 w-4" />
 					Preview Tutorial
 				</AppButton>
-				<AppButton variant="secondary" @click="store.setStage('export')">
+				<AppButton data-testid="skip-export-button" variant="secondary" @click="store.setStage('export')">
 					<ArrowRight class="h-4 w-4" />
 					Skip to Export
 				</AppButton>
