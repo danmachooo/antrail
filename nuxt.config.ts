@@ -18,8 +18,8 @@ export default defineNuxtConfig({
 			title: "AnTrail - AI Tutorial Generator",
 			script: [
 				{
-					src: process.env.NUXT_EMBED_URL || "https://antrail.vercel.app/embed.js",
-					"data-token": process.env.NUXT_ANTRAIL_TOKEN || "fa398e01ebf2",
+					src: process.env.NODE_ENV === "production" ? "https://antrail.vercel.app/embed.js" : "http://localhost:3000/embed.js",
+					"data-token": "fff51feb283b",
 					defer: true,
 				},
 			],
