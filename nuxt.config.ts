@@ -19,7 +19,7 @@ export default defineNuxtConfig({
 			script: [
 				{
 					src: process.env.NUXT_EMBED_URL || "https://antrail.vercel.app/embed.js",
-					"data-token": process.env.ANTRAIL_TOKEN || "fa398e01ebf2",
+					"data-token": process.env.NUXT_ANTRAIL_TOKEN || "fa398e01ebf2",
 					defer: true,
 				},
 			],
@@ -41,6 +41,15 @@ export default defineNuxtConfig({
 		antrailToken: process.env.NUXT_ANTRAIL_TOKEN,
 		public: {
 			apiBase: process.env.NUXT_PUBLIC_API_BASE,
+		},
+	},
+
+	nitro: {
+		storage: {
+			published: {
+				driver: "fs",
+				base: process.env.NODE_ENV === "production" ? "/tmp/antrail/published" : "./.data/kv/published",
+			},
 		},
 	},
 
